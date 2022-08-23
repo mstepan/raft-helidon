@@ -1,0 +1,26 @@
+####################################################################################################
+# Get not state
+####################################################################################################
+curl -v -X GET http://localhost:7070/api/v1/raft/debug-info | jq
+
+
+####################################################################################################
+# Health & metrics
+####################################################################################################
+curl -v -X GET http://localhost:7071/health | jq
+
+curl -v -X GET -H "Accept: application/json" http://localhost:7072/metrics | jq
+
+####################################################################################################
+# Generate unique ID (local + k8s)
+####################################################################################################
+
+curl -v -X GET http://localhost:7070/api/v1/raft/debug-info | jq
+
+#
+# for k8s
+# kubectl get services
+# NAME                     TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+# raft-helidon   NodePort    10.111.78.19   <none>        7070:32245/TCP   54s'
+
+curl -v -X GET http://localhost:32245/api/v1/raft/debug-info | jq

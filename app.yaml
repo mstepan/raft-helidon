@@ -1,0 +1,74 @@
+#####################################
+# Service
+#####################################
+#kind: Namespace
+#apiVersion: v1
+#metadata:
+#  name: raft-helidon-ns
+#  labels:
+#    name: raft-helidon-ns
+#---
+#####################################
+# Service
+#####################################
+kind: Service
+apiVersion: v1
+metadata:
+#  namespace: raft-helidon-ns
+  name: raft-helidon
+  labels:
+    app: raft-helidon
+spec:
+  type: NodePort
+  selector:
+    app: raft-helidon
+  ports:
+  - port: 7070
+    name: api
+  - port: 7071
+    name: health
+  - port: 7072
+    name: metrics
+---
+#####################################
+# Deployment
+#####################################
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+#  namespace: raft-helidon-ns
+  name: raft-helidon
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: raft-helidon
+  template:
+    metadata:
+      labels:
+        app: raft-helidon
+        version: v1
+    spec:
+      containers:
+      - name: raft-helidon
+        image: mylocal/raft-helidon:795c670
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 7070 # api
+          - containerPort: 7071 # health
+          - containerPort: 7072 # metrics
+        #
+        # for JVM tuning and CPU/RAM check https://docs.microsoft.com/en-us/azure/developer/java/containers/kubernetes
+        #
+        env:
+          - name: JAVA_OPTS
+            value: "-XX:+UseParallelGC -XX:MaxRAMPercentage=75 -Djava.util.concurrent.ForkJoinPool.common.parallelism=0 -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=98632K -XX:ReservedCodeCacheSize=240M -Xss1M -Xmx1611447K"
+        resources:
+          limits:
+            cpu: "2"
+            memory: "2Gi"
+          requests:
+            cpu: "2"
+            memory: "2Gi"
+
+---
