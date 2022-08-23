@@ -1,15 +1,17 @@
 package org.max.helidon.raft.domain;
 
-import java.util.concurrent.atomic.AtomicReference;
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class RaftStateMachine {
 
-    private final AtomicReference<MachineState> state = new AtomicReference<>(new MachineState(1, NodeRole.FOLLOWER));
+    private volatile NodeRole role = NodeRole.FOLLOWER;
 
-    public MachineState getState() {
-        return state.get();
+    private volatile PersistentState persistentState = new PersistentState(1, null);
+
+    private volatile VolatileState volatileState = new VolatileState(0, 0);
+
+    public synchronized StateSnapshot getStateSnapshot() {
+        return new StateSnapshot(role, persistentState, volatileState);
     }
-
 }

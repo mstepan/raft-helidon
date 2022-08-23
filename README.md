@@ -1,6 +1,8 @@
 # raft-helidon service
 
-Service that implements [Raft](https://en.wikipedia.org/wiki/Raft_(algorithm)) protocol using Helidon as framework.
+Service that implements [Raft](https://raft.github.io/) protocol using Helidon as framework.
+
+Check also Youtube video [Designing for Understandability: The Raft Consensus Algorithm](https://www.youtube.com/watch?v=vYp4LYbnnW8&t=2071s)
 
 jenv with java 11 installed
 ```

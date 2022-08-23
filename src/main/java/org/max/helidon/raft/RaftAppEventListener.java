@@ -10,7 +10,7 @@ import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
 import org.glassfish.jersey.server.monitoring.RequestEventListener;
 import org.max.helidon.raft.domain.RaftStateMachine;
-import org.max.helidon.raft.domain.TickUpdater;
+import org.max.helidon.raft.domain.Ticker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 public class RaftAppEventListener implements ApplicationEventListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private static final long INITIAL_DELAY_FOR_TICKER_IN_MS = 2000L;
 
     @Inject
     private RaftStateMachine stateMachine;
@@ -27,8 +29,9 @@ public class RaftAppEventListener implements ApplicationEventListener {
     @Override
     public void onEvent(ApplicationEvent applicationEvent) {
         if (isInit(applicationEvent.getType())) {
-            LOG.info("TickUpdater scheduled with initial delay {}ms at fixed rate {}ms", 2000L, 300L);
-            scheduledPool.scheduleAtFixedRate(new TickUpdater(stateMachine), 2000L, 300L, TimeUnit.MILLISECONDS);
+            LOG.info("TickUpdater scheduled with initial delay {}ms", INITIAL_DELAY_FOR_TICKER_IN_MS);
+            scheduledPool.schedule(new Ticker(scheduledPool, stateMachine), INITIAL_DELAY_FOR_TICKER_IN_MS,
+                                   TimeUnit.MILLISECONDS);
         }
         else if (isDestroy(applicationEvent.getType())) {
             scheduledPool.shutdownNow();

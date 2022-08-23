@@ -12,9 +12,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.eclipse.microprofile.metrics.annotation.Timed;
-import org.max.helidon.raft.domain.MachineState;
 import org.max.helidon.raft.domain.NodeRole;
 import org.max.helidon.raft.domain.RaftStateMachine;
+import org.max.helidon.raft.domain.StateSnapshot;
+import org.max.helidon.raft.domain.vote.VoteRequest;
+import org.max.helidon.raft.domain.vote.VoteResponse;
+import org.max.helidon.raft.domain.vote.VoteService;
 import org.max.helidon.raft.util.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +29,10 @@ public class RaftController {
     @Inject
     private RaftStateMachine machineState;
 
+
+    @Inject
+    private VoteService voteService;
+
     @Timed
     @GET
     @Path("dump-state")
@@ -33,11 +40,11 @@ public class RaftController {
     public Response debugInfo() {
         LOG.info("");
 
-        MachineState snapshot = machineState.getState();
+        StateSnapshot snapshot = machineState.getStateSnapshot();
 
         return Response.status(Response.Status.OK).
-            entity(new FiniteMachineStateResponse(snapshot.getTerm(), snapshot.getRole(), NetworkUtils.hostAddress(),
-                                                  "Finite Machine State for node snapshot"))
+            entity(new FiniteMachineStateResponse(snapshot.persistentState().currentTerm(), snapshot.role(),
+                                                  NetworkUtils.hostAddress(), "Finite Machine State for node snapshot"))
             .build();
     }
 
@@ -45,14 +52,12 @@ public class RaftController {
     @Path("vote")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response vote() {
+    public Response vote(VoteRequest voteRequest) {
+        LOG.info("vote request received for candidate: {}", voteRequest.getCandidateId());
 
-        LOG.info("");
+        VoteResponse response = voteService.processVote(voteRequest);
 
-        //TODO:
-        return Response.status(Response.Status.OK).entity(new VoteResponse())
-            .build();
-
+        return Response.status(Response.Status.OK).entity(response).build();
     }
 
     @POST
@@ -63,22 +68,15 @@ public class RaftController {
 
         LOG.info("");
         //TODO:
-        return Response.status(Response.Status.OK).entity(new AppendResponse())
+        return Response.status(Response.Status.OK)
             .build();
 
     }
 
-    public static class AppendResponse {
-
-    }
-
-    public static class VoteResponse {
-
-    }
 
     public static class FiniteMachineStateResponse {
 
-        private final long term;
+        private final long currentTerm;
 
         private final NodeRole state;
 
@@ -87,17 +85,17 @@ public class RaftController {
         private final String details;
 
         @JsonCreator
-        public FiniteMachineStateResponse(@JsonProperty("term") long term, @JsonProperty("state") NodeRole state,
+        public FiniteMachineStateResponse(@JsonProperty("currentTerm") long currentTerm, @JsonProperty("state") NodeRole state,
                                           @JsonProperty("hostAddress") String hostAddress,
                                           @JsonProperty("details") String details) {
-            this.term = term;
+            this.currentTerm = currentTerm;
             this.state = state;
             this.hostAddress = hostAddress;
             this.details = details;
         }
 
-        public long getTerm() {
-            return term;
+        public long getCurrentTerm() {
+            return currentTerm;
         }
 
         public NodeRole getState() {
