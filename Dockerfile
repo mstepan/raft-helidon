@@ -31,4 +31,11 @@ COPY --from=build /helidon/target/libs ./libs
 #
 ENTRYPOINT exec java $JAVA_OPTS  -jar raft-helidon.jar
 
-EXPOSE 7070
+# api port, ENV[SERVER_PORT]
+EXPOSE 7070/tcp
+
+# health port, ENV[SERVER_SOCKET_HEALTH_PORT]
+EXPOSE 7071/tcp
+
+#metrics port, ENV[SERVER_SOCKET_METRICS_PORT]
+EXPOSE 7072/tcp

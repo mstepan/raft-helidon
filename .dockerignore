@@ -1,1 +1,4 @@
-target/*
+#
+# Fully ignores target folder with java/maven artifacts.
+#
+target/

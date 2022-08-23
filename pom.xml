@@ -16,7 +16,6 @@
 
     <properties>
         <assertj.version>3.22.0</assertj.version>
-        <jedis.version>4.2.3</jedis.version>
         <jackson.version>2.13.2.1</jackson.version>
         <javax.rs.api.version>2.1.1</javax.rs.api.version>
         <ok.http.version>2.7.5</ok.http.version>
@@ -68,13 +67,6 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-        </dependency>
-
-        <!-- Jedis: java client for Redis -->
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>${jedis.version}</version>
         </dependency>
 
         <!-- Test scope -->
