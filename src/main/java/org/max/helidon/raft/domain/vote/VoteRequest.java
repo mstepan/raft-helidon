@@ -1,26 +1,30 @@
 package org.max.helidon.raft.domain.vote;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class VoteRequest {
 
+    @JsonProperty("term")
     // candidate’s term
-    private final int term;
+    private int term;
 
+    @JsonProperty("candidateId")
     // candidate requesting vote
-    private final int candidateId;
+    private int candidateId;
 
+    @JsonProperty("lastLogIndex")
     // index of candidate’s last log entry
-    private final int lastLogIndex;
+    private int lastLogIndex;
 
+    @JsonProperty("lastLogTerm")
     //term of candidate’s last log entry
-    private final int lastLogTerm;
+    private int lastLogTerm;
 
+    public VoteRequest() {
+    }
 
-    @JsonCreator
-    public VoteRequest(@JsonProperty("term") int term, @JsonProperty("candidateId") int candidateId,
-                       @JsonProperty("lastLogIndex") int lastLogIndex, @JsonProperty("lastLogTerm") int lastLogTerm) {
+    public VoteRequest(int term, int candidateId, int lastLogIndex, int lastLogTerm) {
         this.term = term;
         this.candidateId = candidateId;
         this.lastLogIndex = lastLogIndex;
